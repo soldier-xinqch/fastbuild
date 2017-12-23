@@ -1,0 +1,56 @@
+#######################################################################################################################
+#####  SPRING BOOT ROOT CONFIG
+#######################################################################################################################
+
+
+#端口号
+server:
+    port: 8888
+    tomcat:
+    # 用于支持页面修改后重新发布到spring-boot内嵌的tomcat中去
+        access_log_enabled: true
+        basedir: target/tomcat
+# 默认约定了Controller试图跳转中thymeleaf模板文件的的前缀prefix是”classpath:/templates/”,后缀suffix是”.html”
+spring:
+  thymeleaf:
+    template-loader-path: classpath:/view/
+    #prefix: /view/
+    suffix: .html
+    cache: false
+
+#在application.properties文件中引入日志配置文件
+#=====================================  log  =============================
+#logging:
+#    config: classpath:logback-spring.xml
+
+datasource:
+      druid:
+          filters: stat
+          maxActive: 20
+          initialSize: 1
+          maxWait: 60000
+          minIdle: 10
+          maxIdle: 15
+          timeBetweenEvictionRunsMillis: 60000
+          minEvictableIdleTimeMillis: 300000
+          validationQuery: SELECT 'x'
+          testWhileIdle: true
+          testOnBorrow: false
+          testOnReturn: false
+          maxOpenPreparedStatements: 20
+          removeAbandoned: true
+          removeAbandonedTimeout: 1800
+          logAbandoned: true
+          poolPreparedStatements: true
+          maxPoolPreparedStatementPerConnectionSize: 50
+      master:
+              driverClass: com.mysql.jdbc.Driver
+              jdbcUrl: jdbc:mysql://127.0.0.1/xinqch_master?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&rewriteBatchedStatements=TRUE&zeroDateTimeBehavior=convertToNull
+              username: root
+              password: xinqch
+      slave:
+              driverClass: com.mysql.jdbc.Driver
+              jdbcUrl: jdbc:mysql://127.0.0.1/xinqch_slave?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&rewriteBatchedStatements=TRUE&zeroDateTimeBehavior=convertToNull
+              username: root
+              password: xinqch
+
