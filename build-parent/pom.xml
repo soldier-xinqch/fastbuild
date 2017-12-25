@@ -5,10 +5,12 @@
   <groupId>com.fastbuild</groupId>
   <artifactId>build-parent</artifactId>
   <version>1.0-SNAPSHOT</version>
+
   <modules>
-    <module>build-auth</module>
     <module>build-utils</module>
+    <module>build-auth</module>
   </modules>
+
   <packaging>pom</packaging>
 
   <name>build-parent</name>
@@ -32,6 +34,21 @@
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.7</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-beanutils</groupId>
+      <artifactId>commons-beanutils</artifactId>
+      <version>1.9.3</version>
+    </dependency>
+    <dependency>
+      <groupId>com.alibaba</groupId>
+      <artifactId>fastjson</artifactId>
+      <version>1.2.44</version>
     </dependency>
   </dependencies>
 </project>
