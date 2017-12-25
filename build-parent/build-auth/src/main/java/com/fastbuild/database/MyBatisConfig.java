@@ -47,6 +47,12 @@ public class MyBatisConfig extends AbstractDruidDBConfig{
         return super.createDataSource(env.getProperty("datasource.slave.driverClass"),env.getProperty("datasource.slave.jdbcUrl"),env.getProperty("datasource.slave.username"),env.getProperty("datasource.slave.password"),druidDbProperties);
     }
 
+    // druid 根据配置文件获取数据源必要参数  参考 http://blog.csdn.net/qq_31591883/article/details/74784016
+//    public DruidDataSource customDataSource() {
+//        druidDbProperties.setConnectionProperties("config.decrypt=true;config.decrypt.key="+env.getProperty("datasource.custom.db_pubkey")+";config.file="+env.getProperty("datasource.custom.db_config_url")+";");
+//        return super.createDataSource(env.getProperty("datasource.slave.driverClass"),env.getProperty("datasource.slave.jdbcUrl"),env.getProperty("datasource.slave.username"),env.getProperty("datasource.slave.password"),druidDbProperties);
+//    }
+
     /**
      * 动态数据源: 通过AOP在不同数据源之间动态切换
      * @return
