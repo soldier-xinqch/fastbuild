@@ -11,6 +11,9 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 
+/**
+ *  链接FTP 客户端
+ */
 public class CostomFTPClient {
 
     public static FTPClient getConnectionFTP(String hostName, int port,

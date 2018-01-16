@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @Title: EncryptAndDecodeUtils.java
- * @Description:
+ * @Description: 文件的加密及解密
  * @author :qianglei
  * @date :2017-2-16 下午2:39:34
  * @version :V1.0

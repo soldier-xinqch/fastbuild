@@ -1,203 +1,210 @@
 package com.fastbuild.file;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.text.DecimalFormat;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.io.OutputStream;
+import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.commons.collections.MapUtils;
-import org.apache.poi.hssf.usermodel.HSSFPicture;
-import org.apache.poi.hssf.usermodel.HSSFPictureData;
-import org.apache.poi.hssf.usermodel.HSSFShape;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.DateUtil;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+/**
+ *  导出工作表格
+ */
 public class ExportExcel {
 
-	private static Logger logger = LoggerFactory.getLogger(ExportExcel.class);
-	private static int sheetIndex = 0;
+    /**
+     * 根据ExcelEntity等参数生成Workbook
+     *
+     * @param entity
+     * @return
+     * @throws Exception
+     */
+    public static <T> Workbook export2Excel(ExcelEntity<T> entity) throws Exception {
+        Workbook workbook = export2Excel(entity.getHeader(), entity.getFooter(), entity.getSheetName(), entity.getColumnNames(), entity.getMethodNames(),
+                entity.getEntities());
+        return workbook;
+    }
 
-	/**
-	 * 读取Excel 文件
-	 * 
-	 * @param filePath
-	 * @return
-	 * @throws IOException
-	 */
-	private static Workbook readExcel(String filePath) throws IOException {
-		Workbook wb = null;
-		if (filePath == null) {
-			return null;
-		}
-		String extString = filePath.substring(filePath.lastIndexOf("."));
-		InputStream is = null;
-		try {
-			is = new FileInputStream(filePath);
-			//wb = WorkbookFactory.create(is);  
-			if (".xls".equals(extString)) {
-				return wb = new HSSFWorkbook(is);
-			} else if (".xlsx".equals(extString)) {
-				return wb = new XSSFWorkbook(is);
-			} else {
-				return wb = null;
-			}
 
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch(OfficeXmlFileException e){
-			//文件转换
-			is = new FileInputStream(filePath);
-			if (".xls".equals(extString)) {
-				return wb = new XSSFWorkbook(is);
-			} else if (".xlsx".equals(extString)) {
-				return wb = new HSSFWorkbook(is);
-			} else {
-				return wb = null;
-			}
-		}finally {
-			if (is != null) {
-				is.close();
-			}
-		}
-		return wb;
-	}
+    /**
+     * 根据给定参数导出Excel文档
+     *
+     * @param headerTitle 题头
+     * @param footerTitle 脚注
+     * @param sheetName
+     * @param columnNames 表头名称
+     * @param methodNames
+     * @param entities
+     * @return
+     * @throws Exception
+     */
+    public static <T> Workbook export2Excel(String headerTitle, String footerTitle, String sheetName, String[] columnNames,
+                                            String[] methodNames, List<T> entities) throws Exception {
+        if (methodNames.length != columnNames.length)
+            throw new IllegalArgumentException("methodNames.length should be equal to columnNames.length:"
+                    + columnNames.length + " " + methodNames.length);
+        Workbook newWorkBook2007 = new XSSFWorkbook();
+        Sheet sheet = newWorkBook2007.createSheet(sheetName);
 
-	/**
-	 * 获取工作表
-	 * 
-	 * @param filePath
-	 * @return
-	 * @throws IOException
-	 * @throws  
-	 */
-	private static Sheet getExcelSheets(String filePath) throws IOException {
-		Workbook wb = readExcel(filePath);
-		return wb.getSheetAt(sheetIndex);
-	}
-	
-	public static Map<Integer,Map<Integer,Object>> getData(String filePath,Integer[] ignoreRows) throws IOException{
-		return getData(getExcelSheets(filePath), ignoreRows,filePath);
-	}
-	
-	public static Map<Integer,Map<Integer,Object>> getData(String filePath) throws IOException{
-		return getData(getExcelSheets(filePath), null,filePath);
-	}
+        //设置题头
+        Header header = sheet.getHeader();
+        header.setCenter(headerTitle);
+        //设置脚注
+        Footer footer = sheet.getFooter();
+        footer.setCenter(footerTitle);
 
-	private static Map<Integer,Map<Integer,Object>> getData(Sheet sheet,Integer[] ignoreRows, String filePath) {
-		Map<Integer,Map<Integer,Object>> resultMap = new HashMap<Integer, Map<Integer, Object>>();
-		//获取最大行数
-		int rowTotalNum = sheet.getPhysicalNumberOfRows();
-		for (int rowIndex = 0; rowIndex < rowTotalNum; rowIndex++) {
-			logger.debug("excel get data ing,curent filePath:{},rowIndex:{}",filePath,rowIndex);
-			// 忽略行 不处理
-			if(isContant(ignoreRows, rowIndex)){
-				continue;
-			}
-			Row row = sheet.getRow(rowIndex);
-			if(null == row){
-				continue;
-			}
-			//获取最大列数
-			int colTotalNum = row.getPhysicalNumberOfCells();
-			
-			Map<Integer,Object> cellMap = new LinkedHashMap<Integer, Object>();
-			for (int cellIndex = 0; cellIndex < colTotalNum; cellIndex++) {
-				//CellReference cellRef = new CellReference(rowIndex, cellIndex);
-				// 单元格名称 System.out.print(cellRef.formatAsString());
-				// 通过获取单元格值并应用任何数据格式（Date，0.00，1.23e9，$ 1.23等），获取单元格中显示的文本
-				//DataFormatter formatter = new DataFormatter();
-				//String text = formatter.formatCellValue(cell);
-				Cell cell = row.getCell(cellIndex);
-				if(null == cell){
-					continue;
-				}
-				// 获取值并自己格式化
-				switch (cell.getCellType()) {
-				case Cell.CELL_TYPE_STRING:// 字符串型
-					cellMap.put(cellIndex, cell.getRichStringCellValue().getString());
-					break;
-				case Cell.CELL_TYPE_NUMERIC:// 数值型
-					if (DateUtil.isCellDateFormatted(cell)) { // 如果是date类型则，获取该cell的date值
-						cellMap.put(cellIndex, cell.getDateCellValue());
-					} else {// 纯数字
-						DecimalFormat df = new DecimalFormat("0");    
-						String cellText = df.format(cell.getNumericCellValue());
-						cellMap.put(cellIndex, cellText);
-					}
-					break;
-				case Cell.CELL_TYPE_BOOLEAN:// 布尔
-					cellMap.put(cellIndex, cell.getBooleanCellValue());
-					break;
-				case Cell.CELL_TYPE_FORMULA:// 公式型
-					cellMap.put(cellIndex, cell.getCellFormula());
-					break;
-				case Cell.CELL_TYPE_BLANK:// 空值
-					break;
-				case Cell.CELL_TYPE_ERROR: // 故障
-					break;
-				default:
-					cellMap.put(cellIndex, null);
-				}
-			}
-			if(MapUtils.isNotEmpty(cellMap)&& cellMap.size()>0)resultMap.put(rowIndex, cellMap);
-		}
-		return resultMap;
-	}
-	
-	/**
-	 *  获取表格中的图片
-	 * @param workbook
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	private static List<HSSFPictureData> getExcelImages(Workbook workbook){
-        List<HSSFPictureData> pictures = (List<HSSFPictureData>) workbook.getAllPictures();//读取图片
-        HSSFSheet sheet = (HSSFSheet) workbook.getSheetAt(sheetIndex);
-        for (HSSFShape shape : sheet.getDrawingPatriarch().getChildren()) {  
-            if (shape instanceof HSSFPicture) {
-                HSSFPicture pic = (HSSFPicture) shape;  
-                int pictureIndex = pic.getPictureIndex()-1;  
-                HSSFPictureData picData = pictures.get(pictureIndex);
-                System.out.println("image-size:" + picData.getData().length);
-            }  
-        }  
-        return pictures;
-	}
-	
-	/**
-	 * 校验 忽略行数
-	 * @param objs
-	 * @param obj
-	 * @return
-	 */
-	private static boolean isContant(Object[] objs,Object obj){
-		if(null != objs&&objs.length>0){ 
-			for (Object object : objs) {
-				if(obj.equals(object)){
-					return true;
-				}
-			}
-		}else{
-			return true;
-		}
-		return false;
-	}
+        int[] columnWidths = new int[columnNames.length];
+        // 创建表头
+        createTableHeader(sheet, 0, headerTitle, columnNames, columnWidths);
+        // 填充表内容
+        createTableContent(sheet, 1, methodNames, columnWidths, entities);
 
+        return newWorkBook2007;
+
+    }
+
+    /**
+     * 创建表头
+     *
+     * @param sheet
+     * @param index        表头开始的行数
+     * @param headerTitle  题头
+     * @param columnNames
+     * @param columnWidths
+     */
+    private static void createTableHeader(Sheet sheet, int index, String headerTitle, String[] columnNames,
+                                          int[] columnWidths) {
+
+
+        Row headerRow = sheet.createRow(index);
+
+        /* 格式设置 */
+        // 设置字体
+        Font font = sheet.getWorkbook().createFont();
+        font.setBold(true);// 粗体显示
+        // 设置背景色
+        CellStyle style = sheet.getWorkbook().createCellStyle();
+        style.setFillForegroundColor(IndexedColors.PALE_BLUE.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setFont(font);
+
+        for (int i = 0; i < columnNames.length; i++) {
+            Cell headerCell = headerRow.createCell(i);
+            headerCell.setCellStyle(style);
+            headerCell.setCellValue(columnNames[i]);
+        }
+
+        for (int i = 0; i < columnNames.length; i++) {
+            columnWidths[i] = (columnNames[i].getBytes().length + 2) * 256;
+            sheet.setColumnWidth(i, columnWidths[i]);
+        }
+
+    }
+
+    /**
+     * 创建表格内容
+     *
+     * @param sheet
+     * @param rowIndexBegin 表内容开始的行数
+     * @param methodNames   T对象的方法名
+     * @param columnWidths
+     * @param entities
+     * @throws Exception
+     */
+    private static <T> void createTableContent(Sheet sheet, int rowIndexBegin, String[] methodNames, int[] columnWidths,
+                                               List<T> entities) throws Exception {
+        Class<? extends Object> clazz = null;
+        if (entities.size() > 0)
+            clazz = entities.get(0).getClass();
+
+        String content = null;
+        for (T t : entities) {
+            Row row = sheet.createRow(rowIndexBegin++);
+            for (int i = 0; i < methodNames.length; i++) {
+                Cell cell = row.createCell(i);
+                Method method = clazz.getMethod(methodNames[i], null);
+                Object object = method.invoke(t, null);
+                object = object == null ? "" : object;
+                if (object.getClass().equals(Date.class)) {// 对日期格式进行特殊处理
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    content = sdf.format((Date) object);
+                    cell.setCellValue(content);
+                } else {
+                    content = object.toString();
+                    cell.setCellValue(content);
+                }
+                int columnWidth = (content.getBytes().length + 2) * 256;
+                if (columnWidth > columnWidths[i]) {// 如果实际内容宽度大于对应的表头宽度，则设置为实际内容宽度
+                    columnWidths[i] = columnWidth;
+                    sheet.setColumnWidth(i, columnWidths[i]);
+                }
+
+            }
+        }
+    }
+
+    public static <T> void testPOI(String[] columnNames, String[] methodNames, List<T> entities) throws Exception {
+        String sheetName = "Test";
+        String title = "标题栏";
+        String dstFile = "d:/temp/test.xlsx";
+        Workbook newWorkBook2007 = new XSSFWorkbook();
+        Sheet sheet = newWorkBook2007.createSheet(sheetName);
+        int[] columnWidths = new int[columnNames.length];
+        // 创建表头
+        createTableHeader(sheet, 0, title, columnNames, columnWidths);
+        // 填充表内容
+        createTableContent(sheet, 1, methodNames, columnWidths, entities);
+        // 保存为文件
+        saveWorkBook2007(newWorkBook2007, dstFile);
+        System.out.println("end");
+
+    }
+
+    /**
+     * @param workbook2007
+     * @param dstFile
+     */
+    public static void saveWorkBook2007(Workbook workbook2007, String dstFile) {
+        File file = new File(dstFile);
+        OutputStream os = null;
+        try {
+            os = new FileOutputStream(file);
+            workbook2007.write(os);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (os != null) {
+                try {
+                    os.close();
+                } catch (IOException e) {
+                    System.out.println(e);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param workbook2007
+     * @param dstFile
+     */
+    public static void saveWorkBook2007(Workbook workbook2007, String dstFile, OutputStream os) {
+        try {
+            workbook2007.write(os);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (os != null) {
+                try {
+                    os.close();
+                } catch (IOException e) {
+                    System.out.println(e);
+                }
+            }
+        }
+    }
 }
+
