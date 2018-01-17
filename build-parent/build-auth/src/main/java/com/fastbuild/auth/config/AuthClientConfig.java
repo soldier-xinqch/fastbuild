@@ -3,6 +3,7 @@ package com.fastbuild.auth.config;
 import com.fastbuild.auth.service.impl.AuthCustomTokenServiceImpl;
 import com.fastbuild.auth.utils.RedisAuthenticationCodeServices;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -37,6 +38,7 @@ public class AuthClientConfig extends AuthorizationServerConfigurerAdapter {
     private static final String AUTH_JWT_KEY = "order";
 
     @Autowired
+    @Qualifier("authenticationManagerBean")
     AuthenticationManager authenticationManager;
 
     @Autowired
@@ -50,22 +52,28 @@ public class AuthClientConfig extends AuthorizationServerConfigurerAdapter {
         clients.inMemory().withClient("client_1")
                 .resourceIds(DEMO_RESOURCE_ID)
                 .authorizedGrantTypes("client_credentials", "refresh_token")
-                .scopes("select")
+                .scopes("select","read","write")
                 .authorities("client")
                 .secret("123456")
                 .accessTokenValiditySeconds(360000)
                 .and()
                 .withClient("client_2")
                 .resourceIds(DEMO_RESOURCE_ID)
-                .authorizedGrantTypes("password", "refresh_token","authorization_code")
+                .authorizedGrantTypes("authorization_code","password","implicit","client_credentials")
                 .scopes("all")
                 .authorities("client")
                 .accessTokenValiditySeconds(360000)
-                .secret("123456");
+                .secret("123456")
+                .and()
+                .withClient("client")
+                .scopes("read","write")
+                .secret("secret")
+                .authorizedGrantTypes("authorization_code","password","implicit","client_credentials");
     }
 
     @Override
     public void configure(AuthorizationServerSecurityConfigurer oauthServer) throws Exception {
+        super.configure(oauthServer);
         //允许表单认证
         oauthServer.allowFormAuthenticationForClients();
     }

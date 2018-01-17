@@ -24,7 +24,9 @@ public class AuthSercuityManager  extends WebSecurityConfigurerAdapter {
         auth.inMemoryAuthentication()
                 .withUser("user_1").password("123456").authorities("USER")
                 .and()
-                .withUser("user_2").password("123456").authorities("USER");
+                .withUser("user_2").password("123456").authorities("USER")
+                .and()
+                .withUser("admin").password("admin").authorities("ROLE_ADMIN");
     }
 
     /**
@@ -42,18 +44,22 @@ public class AuthSercuityManager  extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
+        super.configure(web);
         web.ignoring().antMatchers("/static/**");
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // @formatter:off
-        http
-                .requestMatchers().anyRequest()
-                .and()
-                .csrf().disable()
-                .authorizeRequests()
-                .antMatchers("/*").permitAll();
+        http.formLogin()
+            .and()
+            .authorizeRequests().anyRequest().authenticated()
+            .and()
+            .requestMatchers().anyRequest()
+            .and()
+            .csrf().disable()
+            .authorizeRequests()
+            .antMatchers("/*").permitAll();
         // @formatter:on
 
 
