@@ -12,6 +12,7 @@ import org.springframework.util.Assert;
  * 自定义生成授权码
  *  可以通过扩展AuthorizationCodeServices来覆写已有的生成规则。通过覆写createAuthorizationCode()方法可以设置成任意的生成规则
  *  http://blog.csdn.net/dong_19890208/article/details/74914852
+ *  https://github.com/eugenp/tutorials/tree/master/spring-security-sso
  * @auther xinch
  * @create 2018/1/17 14:21
  */

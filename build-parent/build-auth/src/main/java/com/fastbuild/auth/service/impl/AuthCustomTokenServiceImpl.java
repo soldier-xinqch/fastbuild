@@ -2,7 +2,10 @@ package com.fastbuild.auth.service.impl;
 
 import com.fastbuild.auth.service.IAuthCustomTokenService;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
+import org.springframework.security.oauth2.common.DefaultOAuth2RefreshToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
+import org.springframework.security.oauth2.common.OAuth2RefreshToken;
+import org.springframework.security.oauth2.common.util.RandomValueStringGenerator;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.TokenEnhancer;
 import org.springframework.stereotype.Service;
@@ -21,18 +24,20 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 @Service("authCustomTokenService")
 public class AuthCustomTokenServiceImpl implements IAuthCustomTokenService,TokenEnhancer {
 
+    private RandomValueStringGenerator generator = new RandomValueStringGenerator();
+
     @Override
     public OAuth2AccessToken enhance(OAuth2AccessToken oAuth2AccessToken, OAuth2Authentication oAuth2Authentication) {
         // 自定义生成 token
-//        if (oAuth2AccessToken instanceof DefaultOAuth2AccessToken) {
-//            DefaultOAuth2AccessToken token = ((DefaultOAuth2AccessToken) oAuth2AccessToken);
-//            token.setValue();// 这里设置token
-//
-//            OAuth2RefreshToken refreshToken = token.getRefreshToken();
-//            if (refreshToken instanceof DefaultOAuth2RefreshToken) {
-//                token.setRefreshToken(new DefaultOAuth2RefreshToken(""));// 这里设置token
-//            }
-//        }
+        if (oAuth2AccessToken instanceof DefaultOAuth2AccessToken) {
+            DefaultOAuth2AccessToken token = ((DefaultOAuth2AccessToken) oAuth2AccessToken);
+            token.setValue(generator.generate());// 这里设置token  默认为uuid 这里自定义为默认的6位大小写数字穿插的字符
+
+            OAuth2RefreshToken refreshToken = token.getRefreshToken();
+            if (refreshToken instanceof DefaultOAuth2RefreshToken) {
+                token.setRefreshToken(new DefaultOAuth2RefreshToken(generator.generate()));// 这里设置token
+            }
+        }
 
         Map<String, Object> additionalInfo = new HashMap<>();
         additionalInfo.put("organization", oAuth2Authentication.getName() + randomAlphabetic(4));

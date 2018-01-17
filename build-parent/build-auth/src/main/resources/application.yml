@@ -9,6 +9,8 @@ server:
     # 用于支持页面修改后重新发布到spring-boot内嵌的tomcat中去
         access_log_enabled: true
         basedir: target/tomcat
+    session:
+      timeout: 360000000
 # 默认约定了Controller试图跳转中thymeleaf模板文件的的前缀prefix是”classpath:/templates/”,后缀suffix是”.html”
 spring:
   session:

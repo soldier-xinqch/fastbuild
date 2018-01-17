@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
@@ -21,7 +20,6 @@ import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
-import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
 
 import java.util.Arrays;
 
@@ -55,14 +53,14 @@ public class AuthClientConfig extends AuthorizationServerConfigurerAdapter {
                 .scopes("select")
                 .authorities("client")
                 .secret("123456")
-                .accessTokenValiditySeconds(3600)
+                .accessTokenValiditySeconds(360000)
                 .and()
                 .withClient("client_2")
                 .resourceIds(DEMO_RESOURCE_ID)
-                .authorizedGrantTypes("password", "refresh_token")
+                .authorizedGrantTypes("password", "refresh_token","authorization_code")
                 .scopes("all")
                 .authorities("client")
-                .accessTokenValiditySeconds(3600)
+                .accessTokenValiditySeconds(360000)
                 .secret("123456");
     }
 
