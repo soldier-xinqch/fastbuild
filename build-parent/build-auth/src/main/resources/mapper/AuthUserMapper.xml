@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fastbuild.mapper.AuthUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fastbuild.entity.AuthUser">
+        <id column="id" property="id" />
+        <result column="user_name" property="userName" />
+        <result column="user_password" property="userPassword" />
+        <result column="user_email" property="userEmail" />
+        <result column="user_mobile" property="userMobile" />
+        <result column="real_name" property="realName" />
+        <result column="user_message" property="userMessage" />
+        <result column="user_status" property="userStatus" />
+        <result column="freeze_time" property="freezeTime" />
+        <result column="register_time" property="registerTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, user_name AS userName, user_password AS userPassword, user_email AS userEmail, user_mobile AS userMobile, real_name AS realName, user_message AS userMessage, user_status AS userStatus, freeze_time AS freezeTime, register_time AS registerTime, update_time AS updateTime
+    </sql>
+
+</mapper>

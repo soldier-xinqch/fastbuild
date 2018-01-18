@@ -27,6 +27,7 @@ CREATE TABLE `auth_role` (
   PRIMARY KEY (`id`));
 
 -- 客户端表
+drop table auth_client ;
 CREATE TABLE `auth_client` (
   `id` VARCHAR(64) NOT NULL COMMENT '唯一主键',
   `client_id` VARCHAR(255) NOT NULL COMMENT '客户端ID-区别主键ID',
@@ -37,7 +38,7 @@ CREATE TABLE `auth_client` (
   `expire_time` INT NOT NULL COMMENT '过期时间',
   `register_time` TIMESTAMP NOT NULL COMMENT '注册时间',
   `update_time` TIMESTAMP NULL COMMENT '修改时间',
-  `freeze _time` TIMESTAMP NULL COMMENT '冻结时间',
+  `freeze_time` TIMESTAMP NULL COMMENT '冻结时间',
   `bak` VARCHAR(45) NULL COMMENT '扩展字段',
   PRIMARY KEY (`id`));
 

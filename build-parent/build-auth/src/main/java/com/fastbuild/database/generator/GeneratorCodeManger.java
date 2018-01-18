@@ -25,27 +25,28 @@ import java.util.*;
 public class GeneratorCodeManger {
     private Logger logger = LoggerFactory.getLogger(GeneratorCodeManger.class);
     //文件路径
-    private static String packageName="springbootarchetype";
+    private static String packageName="";
     //作者
     private static String authorName="xinqch";
     //table名字
-    private static String table="AUTH_CLIENT";
+    private static String table="auth_user";
     //table前缀
     private static String prefix="t_";
     //文件生成地址
-    private static File file = new File("G:\\workspace\\ownSpace\\build-auth\\");
+    private static File file = new File("G:\\workspace\\ownSpace\\fastbuild\\fastbuild\\build-parent\\build-auth\\");
     private static String path = file.getAbsolutePath();
     // 数据库类型
     private static DbType dbType = DbType.MYSQL;
     // 数据库驱动
-    private static String db_driver = "org.h2.Driver";
+    private static String db_driver = "com.mysql.jdbc.Driver";
     // 数据库地址
-    private static String db_url = "jdbc:h2:tcp://192.168.10.87:9092/auth;DB_CLOSE_DELAY=-1;WRITE_DELAY=0";
+    private static String db_url = "jdbc:mysql://127.0.0.1/auth_user?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&rewriteBatchedStatements=TRUE&zeroDateTimeBehavior=convertToNull";
     // 数据库用户名
-    private static String db_userName = "sa";
+    private static String db_userName = "root";
     // 数据库密码
-    private static String db_password = "" ;
+    private static String db_password = "xinqch" ;
 
+    @SuppressWarnings("Duplicates")
     public static void main(String[] args) {
         // 自定义需要填充的字段
         List<TableFill> tableFillList = new ArrayList<>();
@@ -109,7 +110,7 @@ public class GeneratorCodeManger {
                         // 自定义 service 实现类父类
                         // .setSuperServiceImplClass("com.baomidou.demo.TestServiceImpl")
                         // 自定义 controller 父类
-                        .setSuperControllerClass("com.tdx."+packageName+".controller.AbstractController")
+//                        .setSuperControllerClass("com.tdx."+packageName+".controller.AbstractController")
                 // 【实体】是否生成字段常量（默认 false）
                 // public static final String ID = "test_id";
                 // .setEntityColumnConstant(true)
@@ -126,7 +127,7 @@ public class GeneratorCodeManger {
                 // 包配置
                 new PackageConfig()
                         //.setModuleName("User")
-                        .setParent("com.fastbuild."+packageName)// 自定义包路径
+                        .setParent("com.fastbuild")// 自定义包路径
                         .setController("controller")// 这里是控制器包名，默认 web
                         .setEntity("entity")
                         .setMapper("mapper")
