@@ -33,6 +33,7 @@ import java.util.Arrays;
 @Configuration
 @EnableAuthorizationServer
 public class AuthClientConfig extends AuthorizationServerConfigurerAdapter {
+
     private static final String DEMO_RESOURCE_ID = "order";
 
     private static final String AUTH_JWT_KEY = "order";

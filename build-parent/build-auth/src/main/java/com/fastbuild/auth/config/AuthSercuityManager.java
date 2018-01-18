@@ -45,7 +45,9 @@ public class AuthSercuityManager  extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) throws Exception {
         super.configure(web);
-        web.ignoring().antMatchers("/static/**");
+        web
+            .ignoring()
+            .antMatchers("/static/**","h2-console/**","/druid/**");
     }
 
     @Override
@@ -53,13 +55,14 @@ public class AuthSercuityManager  extends WebSecurityConfigurerAdapter {
         // @formatter:off
         http.formLogin()
             .and()
-            .authorizeRequests().anyRequest().authenticated()
+            .anonymous()
+//            .authorizeRequests().anyRequest().authenticated()
             .and()
-            .requestMatchers().anyRequest()
-            .and()
-            .csrf().disable()
-            .authorizeRequests()
-            .antMatchers("/*").permitAll();
+            .csrf().disable();
+//      解决 ifream 此处应该有内容,但发布者不允许在框架中显示该内容。 问题 http://blog.csdn.net/qq1049545450/article/details/62887050
+        http.headers().frameOptions().disable();
+//            .authorizeRequests()
+//            .antMatchers("/*").permitAll();
         // @formatter:on
 
 

@@ -29,7 +29,7 @@ public class GeneratorCodeManger {
     //作者
     private static String authorName="xinqch";
     //table名字
-    private static String table="test_tab";
+    private static String table="AUTH_CLIENT";
     //table前缀
     private static String prefix="t_";
     //文件生成地址
@@ -38,13 +38,13 @@ public class GeneratorCodeManger {
     // 数据库类型
     private static DbType dbType = DbType.MYSQL;
     // 数据库驱动
-    private static String db_driver = "com.mysql.jdbc.Driver";
+    private static String db_driver = "org.h2.Driver";
     // 数据库地址
-    private static String db_url = "jdbc:mysql://127.0.0.1:3306/xinqch_master?characterEncoding=utf8";
+    private static String db_url = "jdbc:h2:tcp://192.168.10.87:9092/auth;DB_CLOSE_DELAY=-1;WRITE_DELAY=0";
     // 数据库用户名
-    private static String db_userName = "root";
+    private static String db_userName = "sa";
     // 数据库密码
-    private static String db_password = "xinqch" ;
+    private static String db_password = "" ;
 
     public static void main(String[] args) {
         // 自定义需要填充的字段

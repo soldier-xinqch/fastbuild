@@ -9,6 +9,7 @@
   <modules>
     <module>build-utils</module>
     <module>build-auth</module>
+    <module>build-oauth2</module>
   </modules>
 
   <packaging>pom</packaging>
