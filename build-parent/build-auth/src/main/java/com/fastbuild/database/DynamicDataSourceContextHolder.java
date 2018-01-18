@@ -18,14 +18,15 @@ public class DynamicDataSourceContextHolder {
      * 默认数据源
      */
     public static final String DEFAULT_DATASOURCE = DataSourceEnum.DATASOURCEKEY.MASTER.getCode();
-
+    /**
+     *  线程池 用来把保存数据线程
+     */
     private static final ThreadLocal<String> contextHolder = new ThreadLocal<>();
     /*
      * 管理所有的数据源id;
      * 主要是为了判断数据源是否存在;
      */
     public static Set<Object> dataSourceKeys = new HashSet<Object>();
-
     /**
      * 设置数据源名
      */
@@ -33,7 +34,6 @@ public class DynamicDataSourceContextHolder {
         log.debug("切换到{}数据源", dbType);
         contextHolder.set(dbType);
     }
-
     /**
      * 获取数据源名
      *

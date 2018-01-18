@@ -102,6 +102,7 @@ public class AuthJwtUser implements UserDetails {
      * @param userJsonMsg
      * @return
      */
+    @SuppressWarnings("Duplicates")
     public static AuthJwtUser create(JSONObject userJsonMsg) {
         Assert.isNull(userJsonMsg,"构建认证用户信息异常：原始用户信息JSON数据为空");
         try {
