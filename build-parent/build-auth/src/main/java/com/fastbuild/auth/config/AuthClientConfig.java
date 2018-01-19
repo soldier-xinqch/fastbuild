@@ -33,7 +33,6 @@ import java.util.Arrays;
 @Configuration
 @EnableAuthorizationServer
 public class AuthClientConfig extends AuthorizationServerConfigurerAdapter {
-
     private static final String DEMO_RESOURCE_ID = "order";
 
     private static final String AUTH_JWT_KEY = "order";
@@ -45,8 +44,6 @@ public class AuthClientConfig extends AuthorizationServerConfigurerAdapter {
     @Autowired
     private RedisConnectionFactory connectionFactory;
 
-
-
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         //配置两个客户端,一个用于password认证一个用于client认证
@@ -55,18 +52,22 @@ public class AuthClientConfig extends AuthorizationServerConfigurerAdapter {
                 .authorizedGrantTypes("client_credentials", "refresh_token")
                 .scopes("select","read","write")
                 .secret("123456")
+                .authorities("client")
                 .accessTokenValiditySeconds(360000)
                 .and()
                 .withClient("client_2")
                 .resourceIds(DEMO_RESOURCE_ID)
                 .authorizedGrantTypes("authorization_code","password","implicit","client_credentials")
                 .scopes("all")
-                .accessTokenValiditySeconds(360000)
                 .secret("123456")
+                .authorities("client")
+                .accessTokenValiditySeconds(360000)
                 .and()
                 .withClient("client")
                 .scopes("read","write")
                 .secret("secret")
+                .authorities("client")
+                .accessTokenValiditySeconds(360000)
                 .authorizedGrantTypes("authorization_code","password","implicit","client_credentials");
     }
 

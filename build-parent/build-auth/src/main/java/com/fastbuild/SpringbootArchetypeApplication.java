@@ -28,12 +28,6 @@ public class SpringbootArchetypeApplication {
 
 	}
 
-//	@Override
-//	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-//		startH2Server();
-//		return application.sources(SpringbootArchetypeApplication.class);
-//	}
-
 	/**
 	 *  启动h2 数据库服务
 	 *  服务式 （Server） jdbc:h2:tcp://localhost/~/test
@@ -59,7 +53,7 @@ public class SpringbootArchetypeApplication {
 			}
 			File file = new File(h2DBBaseDir);
 			if (!file.exists()) file.mkdirs();
-			Server h2Server = Server.createTcpServer("-tcpAllowOthers","-pgAllowOthers","-baseDir",h2DBBaseDir).start();
+			Server h2Server = Server.createTcpServer("-tcpAllowOthers","-baseDir",h2DBBaseDir).start();
 //			Server h2Server = Server.createTcpServer("-tcpAllowOthers","-tcpPort",h2Port,"-baseDir",h2DBBaseDir).start();
 			if (h2Server.isRunning(true)) {
 				logger.debug("H2 数据库 存储文件目录为 h2DBBaseDir:{}",h2DBBaseDir);

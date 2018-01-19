@@ -25,7 +25,7 @@ import java.util.Map;
  * @create 2017/12/21 14:21
  */
 @Configuration
-@MapperScan(basePackages = {"com.fastbuild.mapper"},sqlSessionTemplateRef = "sqlSessionTemplate")
+@MapperScan(basePackages = {"com.fastbuild.mapper*"},sqlSessionTemplateRef = "sqlSessionTemplate")
 public class MyBatisConfig extends AbstractDruidDBConfig{
 
     @Autowired

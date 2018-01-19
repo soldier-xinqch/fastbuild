@@ -5,7 +5,6 @@ import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientRegistrationException;
 import org.springframework.stereotype.Service;
 
-@Service("authClientService")
 public class AuthClientServiceImpl implements IAuthClientService {
 
 

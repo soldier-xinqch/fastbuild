@@ -11,6 +11,18 @@ public class SpringbootArchetypeApplicationTests {
 
 	@Test
 	public void contextLoads() {
+
+
 	}
+
+
+//	@Test
+//	public void testUserListPage() {
+//		JSONObject result = httpGet("/user/test");
+//		Integer total = result.getInteger("total");
+//		Assert.assertTrue(0 != total);
+//		Assert.assertNotNull(result.get("records"));
+//		System.out.println(result);
+//	}
 
 }

@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
@@ -78,6 +77,7 @@ public class AuthResourceConfig extends ResourceServerConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/write/**").access("#oauth2.hasScope('write')")
                 .antMatchers(HttpMethod.PUT, "/write/**").access("#oauth2.hasScope('write')")
                 .antMatchers(HttpMethod.DELETE, "/write/**").access("#oauth2.hasScope('write')");
+//        http.headers().frameOptions().disable();
 //        // @formatter:off
 //        http
 //                // Since we want the protected resources to be accessible in the UI as well we need
@@ -92,14 +92,5 @@ public class AuthResourceConfig extends ResourceServerConfigurerAdapter {
 ////                    .antMatchers("/product/**").access("#oauth2.hasScope('select') and hasRole('ROLE_USER')")
 //                .antMatchers("/*/**").authenticated();//配置order访问控制，必须认证过后才可以访问
 //        // @formatter:on
-
-        http
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-            .and()
-            .requestMatchers().anyRequest()
-            .and()
-            .authorizeRequests()
-            .antMatchers("/product/**").access("#oauth2.hasScope('select') and hasRole('ROLE_USER')");
-        http.headers().frameOptions().disable();
     }
 }

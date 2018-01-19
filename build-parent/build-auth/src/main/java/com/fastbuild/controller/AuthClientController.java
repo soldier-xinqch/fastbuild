@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
  * ---------------------------------
  * @since 2018-01-18
  */
+@SuppressWarnings("Duplicates")
 @RestController
 @RequestMapping("/authClient")
 public class AuthClientController {
