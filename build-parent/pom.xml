@@ -10,6 +10,7 @@
     <module>build-utils</module>
     <module>build-auth</module>
     <module>build-oauth2</module>
+      <module>build-mybatisplus</module>
   </modules>
 
   <packaging>pom</packaging>

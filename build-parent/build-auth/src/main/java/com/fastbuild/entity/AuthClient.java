@@ -17,7 +17,7 @@ import com.baomidou.mybatisplus.activerecord.Model;
  * @since 2018-01-18
  */
 @TableName("auth_client")
-public class AuthClient extends Model<AuthClient> {
+public class AuthClient extends Model<AuthClient> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

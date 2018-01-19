@@ -3,6 +3,7 @@ package com.fastbuild;
 import com.fastbuild.common.CheckOsInfo;
 import com.fastbuild.common.EPlatform;
 import org.h2.tools.Server;
+import org.mybatis.spring.annotation.MapperScan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.Banner;
@@ -13,6 +14,7 @@ import java.io.File;
 import java.sql.SQLException;
 
 @SpringBootApplication
+@MapperScan("com.fastbuild.mapper")
 public class SpringbootArchetypeApplication {
 
 	private static Logger logger = LoggerFactory.getLogger(SpringbootArchetypeApplication.class);

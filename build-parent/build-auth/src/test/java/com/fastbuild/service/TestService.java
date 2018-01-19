@@ -37,7 +37,7 @@ public class TestService {
     @Test
     public void testInsertClient()  {
 
-        AuthClient result = authClientService.selectById("123123");
+        AuthClient result = authClientService.selectById("1");
         Assert.assertNotNull(result);
 //
 //        AuthClient client = new AuthClient();

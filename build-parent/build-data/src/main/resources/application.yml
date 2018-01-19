@@ -1,0 +1,38 @@
+server:
+  port: 8087
+
+spring:
+#  application:
+#    name: user-service
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: xinqch
+    url: jdbc:mysql://127.0.0.1/xinqch_master?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&rewriteBatchedStatements=TRUE&zeroDateTimeBehavior=convertToNull
+#eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: http://eureka.didispace.com/eureka/
+
+#mybaits-plus config
+mybatis-plus:
+  mapper-locations: classpath:/mapper/*Mapper.xml
+  typeAliasesPackage: com.fastbuild.builddata.entity
+  global-config:
+    #主键类型  0:"数据库ID自增", 1:"用户输入ID",2:"全局唯一ID (数字类型唯一ID)", 3:"全局唯一ID UUID";
+    id-type: 0
+    #字段策略 0:"忽略判断",1:"非 NULL 判断"),2:"非空判断"
+    field-strategy: 0
+    #驼峰下划线转换
+    db-column-underline: true
+    #刷新mapper 调试神器
+    refresh-mapper: true
+    #数据库大写下划线转换
+    #capital-mode: true
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: true
+#logging:
+#  config: classpath:logback.xml
+
+

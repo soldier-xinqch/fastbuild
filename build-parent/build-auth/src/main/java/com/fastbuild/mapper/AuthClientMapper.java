@@ -3,6 +3,7 @@ package com.fastbuild.mapper;
 import com.fastbuild.entity.AuthClient;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import org.springframework.stereotype.Repository;
 
 /**
  * <p>
@@ -12,6 +13,7 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
  * @author xinqch
  * @since 2018-01-18
  */
+@Repository
 public interface AuthClientMapper extends BaseMapper<AuthClient> {
 
 }
