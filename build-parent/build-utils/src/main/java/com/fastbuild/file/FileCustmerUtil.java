@@ -66,7 +66,7 @@ public class FileCustmerUtil {
     }
 
     public static List<File> traverseFolder(String path,String fileType){
-        List<File> files = new ArrayList<>();
+        List<File> files = new ArrayList<File>();
         traverseFolder(path,files,fileType);
         return files;
     }

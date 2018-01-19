@@ -266,7 +266,7 @@ public class MailUtils {
             if (!file.exists()) file.mkdirs();
             saveEmailPath = saveEmailPath + sendTo + "_" + (new Date()).getTime() + ".eml";
             message.writeTo(new FileOutputStream(saveEmailPath));
-        } catch (IOException | MessagingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
