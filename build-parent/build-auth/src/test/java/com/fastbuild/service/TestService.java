@@ -2,12 +2,18 @@ package com.fastbuild.service;
 
 import com.fastbuild.common.StringCustomUtil;
 import com.fastbuild.entity.AuthClient;
+import com.fastbuild.entity.TestTab;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Date;
 
@@ -34,7 +40,21 @@ public class TestService {
     @Autowired
     public AuthClientService authClientService;
 
+    @Autowired
+    private TestTabService testTabService;
+
     @Test
+    public void getShop() {
+        String id ="1";
+        System.out.println("id = [" + id + "]");
+        TestTab t1 = testTabService.getById(id);
+        System.out.println("id = [" + t1.getId()+"---"+ t1.getMessage()+ "]");
+        TestTab t2 = testTabService.getByIdSlave(id);
+        System.out.println("id = [" + t2.getId()+"---"+ t2.getMessage() + "]");
+    }
+
+    @Test
+    @Ignore
     public void testInsertClient()  {
 
         AuthClient result = authClientService.selectById("1");
