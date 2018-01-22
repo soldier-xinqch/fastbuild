@@ -1,5 +1,8 @@
 package com.fastbuild.auth.config;
 
+import com.alibaba.druid.pool.DruidDataSource;
+import com.fastbuild.auth.service.IAuthClientService;
+import com.fastbuild.auth.service.impl.AuthClientServiceImpl;
 import com.fastbuild.auth.service.impl.AuthCustomTokenServiceImpl;
 import com.fastbuild.auth.utils.RedisAuthenticationCodeServices;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,7 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
+import javax.annotation.Resource;
 import java.util.Arrays;
 
 /**
@@ -33,9 +37,10 @@ import java.util.Arrays;
 @Configuration
 @EnableAuthorizationServer
 public class AuthClientConfig extends AuthorizationServerConfigurerAdapter {
-    private static final String DEMO_RESOURCE_ID = "order";
 
-    private static final String AUTH_JWT_KEY = "order";
+    private static final String AUTH_TOKEN_JWT_KEY = "OAUTH2_TOKEN_XINQCH";
+
+    private static final String DEMO_RESOURCE_ID = "OAUTH2_RESOURCEID_XINQCH";
 
     @Autowired
     @Qualifier("authenticationManagerBean")
@@ -44,31 +49,38 @@ public class AuthClientConfig extends AuthorizationServerConfigurerAdapter {
     @Autowired
     private RedisConnectionFactory connectionFactory;
 
+    @Resource(name ="authClientService")
+    private IAuthClientService authClientService;
+
+    @Resource(name = "masterDataSource")
+    public DruidDataSource dataSource;
+
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        //配置两个客户端,一个用于password认证一个用于client认证
-        clients.inMemory().withClient("client_1")
-                .resourceIds(DEMO_RESOURCE_ID)
-                .authorizedGrantTypes("client_credentials", "refresh_token")
-                .scopes("select","read","write")
-                .secret("123456")
-                .authorities("client")
-                .accessTokenValiditySeconds(360000)
-                .and()
-                .withClient("client_2")
-                .resourceIds(DEMO_RESOURCE_ID)
-                .authorizedGrantTypes("authorization_code","password","implicit","client_credentials")
-                .scopes("all")
-                .secret("123456")
-                .authorities("client")
-                .accessTokenValiditySeconds(360000)
-                .and()
-                .withClient("client")
-                .scopes("read","write")
-                .secret("secret")
-                .authorities("client")
-                .accessTokenValiditySeconds(360000)
-                .authorizedGrantTypes("authorization_code","password","implicit","client_credentials");
+        clients.jdbc(dataSource);
+//                .and() // 兼容模式
+//                .withClient("client_test")
+//                .resourceIds(DEMO_RESOURCE_ID)
+//                .authorizedGrantTypes("client_credentials", "refresh_token")
+//                .scopes("select","read","write")
+//                .secret("123456")
+//                .authorities("client")
+//                .accessTokenValiditySeconds(360000)
+//                .and()
+//                .withClient("client_2")
+//                .resourceIds(DEMO_RESOURCE_ID)
+//                .authorizedGrantTypes("authorization_code","password","implicit","client_credentials")
+//                .scopes("all")
+//                .secret("123456")
+//                .authorities("client")
+//                .accessTokenValiditySeconds(360000)
+//                .and()
+//                .withClient("client")
+//                .scopes("read","write")
+//                .secret("secret")
+//                .authorities("client")
+//                .accessTokenValiditySeconds(360000)
+//                .authorizedGrantTypes("authorization_code","password","implicit","client_credentials");
     }
 
     @Override
@@ -95,6 +107,8 @@ public class AuthClientConfig extends AuthorizationServerConfigurerAdapter {
                 // 授权码
                 .authorizationCodeServices(authorizationCodeServices())
                 .authenticationManager(authenticationManager);
+
+        endpoints.setClientDetailsService(authClientService);
         /**
          *  替换默认链接
          */
@@ -145,7 +159,7 @@ public class AuthClientConfig extends AuthorizationServerConfigurerAdapter {
 //        return converter;
 //    }
         JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-        converter.setSigningKey(AUTH_JWT_KEY);
+        converter.setSigningKey(AUTH_TOKEN_JWT_KEY);
         return converter;
     }
 

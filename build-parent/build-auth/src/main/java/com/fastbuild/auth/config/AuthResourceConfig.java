@@ -25,9 +25,9 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class AuthResourceConfig extends ResourceServerConfigurerAdapter {
 
-    private static final String DEMO_RESOURCE_ID = "order";
+    private static final String DEMO_RESOURCE_ID = "OAUTH2_RESOURCEID_XINQCH";
 
-    private static final String AUTH_JWT_KEY = "order";
+    private static final String AUTH_TOKEN_JWT_KEY = "OAUTH2_TOKEN_XINQCH";
 
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) {
@@ -56,7 +56,7 @@ public class AuthResourceConfig extends ResourceServerConfigurerAdapter {
 //        return converter;
 //    }
         JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-        converter.setSigningKey(AUTH_JWT_KEY);
+        converter.setSigningKey(AUTH_TOKEN_JWT_KEY);
         return converter;
     }
 
@@ -68,8 +68,6 @@ public class AuthResourceConfig extends ResourceServerConfigurerAdapter {
         return defaultTokenServices;
     }
 
-
-
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http.antMatcher("/oauth2/api/**").authorizeRequests()
@@ -77,20 +75,5 @@ public class AuthResourceConfig extends ResourceServerConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/write/**").access("#oauth2.hasScope('write')")
                 .antMatchers(HttpMethod.PUT, "/write/**").access("#oauth2.hasScope('write')")
                 .antMatchers(HttpMethod.DELETE, "/write/**").access("#oauth2.hasScope('write')");
-//        http.headers().frameOptions().disable();
-//        // @formatter:off
-//        http
-//                // Since we want the protected resources to be accessible in the UI as well we need
-//                // session creation to be allowed (it's disabled by default in 2.0.6)
-//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-//                .and()
-//                .requestMatchers().anyRequest()
-//                .and()
-//                .anonymous()
-//                .and()
-//                .authorizeRequests()
-////                    .antMatchers("/product/**").access("#oauth2.hasScope('select') and hasRole('ROLE_USER')")
-//                .antMatchers("/*/**").authenticated();//配置order访问控制，必须认证过后才可以访问
-//        // @formatter:on
     }
 }

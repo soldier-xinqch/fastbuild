@@ -3,10 +3,10 @@ package com.fastbuild.auth.model;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import org.junit.Assert;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.util.Assert;
 
 import java.util.Collection;
 import java.util.List;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  */
 public class AuthJwtUser implements UserDetails {
 
-    private final Long id;
+    private final String id;
     private final String username; //设置为account
     private final String password;
     private final Collection<? extends GrantedAuthority> authorities;
@@ -32,7 +32,7 @@ public class AuthJwtUser implements UserDetails {
      * @param password
      * @param authorities
      */
-    public AuthJwtUser(Long id, String username, String password,  Collection<? extends GrantedAuthority> authorities) {
+    public AuthJwtUser(String id, String username, String password,  Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -104,19 +104,18 @@ public class AuthJwtUser implements UserDetails {
      */
     @SuppressWarnings("Duplicates")
     public static AuthJwtUser create(JSONObject userJsonMsg) {
-        Assert.isNull(userJsonMsg,"构建认证用户信息异常：原始用户信息JSON数据为空");
         try {
             String userId =  userJsonMsg.getString("id");
-            Assert.isNull(userId,"构建认证用户信息异常：原始用户信息id数据为空");
+            Assert.assertNotNull(userId,"构建认证用户信息异常：原始用户信息id数据为空");
             String userName = userJsonMsg.getString("userName");
-            Assert.isNull(userName,"构建认证用户信息异常：原始用户信息userName数据为空");
-            String userPasswd = userJsonMsg.getString("password");
-            Assert.isNull(userPasswd,"构建认证用户信息异常：原始用户信息userPasswd数据为空");
+            Assert.assertNotNull(userName,"构建认证用户信息异常：原始用户信息userName数据为空");
+            String userPasswd = userJsonMsg.getString("userPassword");
+            Assert.assertNotNull(userPasswd,"构建认证用户信息异常：原始用户信息userPasswd数据为空");
             JSONArray rolesArrays = userJsonMsg.getJSONArray("roles");
-            Assert.isNull(rolesArrays,"构建认证用户信息异常：原始用户信息roles数据为空");
+//            Assert.assertNull(rolesArrays,"构建认证用户信息异常：原始用户信息roles数据为空");
             List<String> roleList = rolesArrays.toJavaList(String.class);
-            Assert.isNull(roleList,"构建认证用户信息异常：原始用户信息roles数据转为异常");
-            return new AuthJwtUser(Long.valueOf(userId),userName,userPasswd,mapToGrantedAuthorities(roleList));
+//            Assert.(roleList,"构建认证用户信息异常：原始用户信息roles数据转为异常");
+            return new AuthJwtUser(userId,userName,userPasswd,mapToGrantedAuthorities(roleList));
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -7,14 +7,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.fastbuild.service.AuthClientService;
-import com.fastbuild.entity.AuthClient;
+import com.fastbuild.service.OauthClientDetailsService;
+import com.fastbuild.entity.OauthClientDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * code is far away from bug with the animal protecting
- *   ┏┓　　　┏┓
+ * ┏┓　　　┏┓
  * ┏┛┻━━━┛┻┓
  * ┃　　　　　　　┃
  * ┃　　　━　　　┃
@@ -33,30 +33,29 @@ import org.slf4j.LoggerFactory;
  * 　　　┗┻┛　┗┻┛
  *
  * @author xinqch
- * @description : AuthClient 控制器
+ * @description : OauthClientDetails 控制器
  * ---------------------------------
- * @since 2018-01-18
+ * @since 2018-01-22
  */
-@SuppressWarnings("Duplicates")
 @RestController
-@RequestMapping("/authClient")
-public class AuthClientController {
-    private final Logger logger = LoggerFactory.getLogger(AuthClientController.class);
+@RequestMapping("/oauthClientDetails")
+public class OauthClientDetailsController {
+    private final Logger logger = LoggerFactory.getLogger(OauthClientDetailsController.class);
 
     @Autowired
-    public AuthClientService authClientService;
+    public OauthClientDetailsService oauthClientDetailsService;
 
     /**
-     * @description : 通过id获取AuthClient
+     * @description : 通过id获取OauthClientDetails
      * ---------------------------------
      * @author : xinqch
-     * @since : Create in 2018-01-18
+     * @since : Create in 2018-01-22
      */
-    @RequestMapping(value = "/getAuthClientById", method = RequestMethod.GET)
-    public Object getAuthClientById(String id) {
-        RestResult<AuthClient> resJson = new RestResult<>();
+    @RequestMapping(value = "/getOauthClientDetailsById", method = RequestMethod.GET)
+    public Object getOauthClientDetailsById(String id) {
+        RestResult<OauthClientDetails> resJson = new RestResult<>();
         try {
-            AuthClient param = authClientService.selectById(id);
+            OauthClientDetails param = oauthClientDetailsService.selectById(id);
             resJson.setDataObject(param);
             resJson.setSuccess(true);
         } catch (Exception e) {
@@ -68,16 +67,16 @@ public class AuthClientController {
     }
 
     /**
-     * @description : 通过id删除AuthClient
+     * @description : 通过id删除OauthClientDetails
      * ---------------------------------
      * @author : xinqch
-     * @since : Create in 2018-01-18
+     * @since : Create in 2018-01-22
      */
-    @RequestMapping(value = "/deleteAuthClientById", method = RequestMethod.GET)
-    public Object deleteAuthClientById(String id) {
-        RestResult<AuthClient> resJson = new RestResult<>();
+    @RequestMapping(value = "/deleteOauthClientDetailsById", method = RequestMethod.GET)
+    public Object deleteOauthClientDetailsById(String id) {
+        RestResult<OauthClientDetails> resJson = new RestResult<>();
         try {
-            resJson.setSuccess(authClientService.deleteById(id));
+            resJson.setSuccess(oauthClientDetailsService.deleteById(id));
         } catch (Exception e) {
             resJson.setSuccess(false);
             resJson.setMessage("异常信息:{" + e.getClass().getName() + "}");
@@ -87,16 +86,16 @@ public class AuthClientController {
     }
 
     /**
-     * @description : 通过id更新AuthClient
+     * @description : 通过id更新OauthClientDetails
      * ---------------------------------
      * @author : xinqch
-     * @since : Create in 2018-01-18
+     * @since : Create in 2018-01-22
      */
-    @RequestMapping(value = "/updateAuthClientById", method = RequestMethod.POST)
-    public Object updateAuthClientById(AuthClient param) {
-        RestResult<AuthClient> resJson = new RestResult<>();
+    @RequestMapping(value = "/updateOauthClientDetailsById", method = RequestMethod.POST)
+    public Object updateOauthClientDetailsById(OauthClientDetails param) {
+        RestResult<OauthClientDetails> resJson = new RestResult<>();
         try {
-            resJson.setSuccess(authClientService.updateById(param));
+            resJson.setSuccess(oauthClientDetailsService.updateById(param));
         } catch (Exception e) {
             resJson.setSuccess(false);
             resJson.setMessage("异常信息:{" + e.getClass().getName() + "}");
@@ -106,16 +105,16 @@ public class AuthClientController {
     }
 
     /**
-     * @description : 添加AuthClient
+     * @description : 添加OauthClientDetails
      * ---------------------------------
      * @author : xinqch
-     * @since : Create in 2018-01-18
+     * @since : Create in 2018-01-22
      */
-    @RequestMapping(value = "/addAuthClient", method = RequestMethod.POST)
-    public Object addAuthClient(AuthClient param) {
-        RestResult<AuthClient> resJson = new RestResult<>();
+    @RequestMapping(value = "/addOauthClientDetails", method = RequestMethod.POST)
+    public Object addOauthClientDetails(OauthClientDetails param) {
+        RestResult<OauthClientDetails> resJson = new RestResult<>();
         try {
-            resJson.setSuccess(authClientService.insert(param));
+            resJson.setSuccess(oauthClientDetailsService.insert(param));
         } catch (Exception e) {
             resJson.setSuccess(false);
             resJson.setMessage("异常信息:{" + e.getClass().getName() + "}");

@@ -1,11 +1,22 @@
 package com.fastbuild.auth.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.fastbuild.auth.model.AuthJwtUser;
 import com.fastbuild.auth.service.IAuthUserDetailService;
+import com.fastbuild.entity.AuthUser;
+import com.fastbuild.entity.AuthUserRole;
+import com.fastbuild.service.AuthUserRoleService;
+import com.fastbuild.service.AuthUserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 用户安全验证用户信息服务类
@@ -17,6 +28,10 @@ import org.springframework.stereotype.Service;
 public class AuthUserDetailServiceImpl implements IAuthUserDetailService {
 
 
+    @Autowired
+    private AuthUserService authUserService;
+    @Autowired
+    private AuthUserRoleService authUserRoleService;
     /**
      * 提供一种从用户名可以查到用户并返回的方法
      * @param userName
@@ -25,15 +40,26 @@ public class AuthUserDetailServiceImpl implements IAuthUserDetailService {
      */
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-        /**TODO:此处需要写明从用户表里面跟根据用户account查询用户的方法**/
-//        User user =new User();
-//        user.setAccount("17319237587");
-//        user.setPwd("123");
-//        user.setUserId(1L);
-//        List<String> roles=new ArrayList<>();
-//        roles.add("ADMIN");
-//        user.setRoles(roles);
-        JSONObject jsonObject = new JSONObject();
-        return AuthJwtUser.create(jsonObject);
+
+        Wrapper<AuthUser> wrapper = new EntityWrapper<>();
+        wrapper.eq("USER_NAME",userName);
+        AuthUser user = authUserService.selectOne(wrapper);
+
+        Wrapper<AuthUserRole>  roleWrapper = new EntityWrapper<>();
+        roleWrapper.eq("USER_ID",user.getId());
+        List<AuthUserRole> roles = authUserRoleService.selectList(roleWrapper);
+
+        List<String> roleAuths = new ArrayList<>();
+        for (AuthUserRole userRole: roles ) {
+            roleAuths.add(userRole.getRoleType());
+        }
+        JSONObject roleAuthJson = new JSONObject();
+        String roleStrs =  JSONArray.toJSONString(roleAuths);
+
+        String userJson = JSONObject.toJSONString(user);
+        System.out.println(userJson);
+        JSONObject userJsonObj =  JSONObject.parseObject(userJson);
+        userJsonObj.put("roles",JSONArray.parseArray(roleStrs));
+        return AuthJwtUser.create(userJsonObj);
     }
 }

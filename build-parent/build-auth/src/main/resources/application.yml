@@ -70,10 +70,10 @@ datasource:
           poolPreparedStatements: true
           maxPoolPreparedStatementPerConnectionSize: 50
       master:
-              driverClass: com.mysql.jdbc.Driver
-              jdbcUrl: jdbc:mysql://127.0.0.1/xinqch_master?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&rewriteBatchedStatements=TRUE&zeroDateTimeBehavior=convertToNull
-              username: root
-              password: xinqch
+              driverClass: org.h2.Driver
+              jdbcUrl: jdbc:h2:tcp://192.168.10.87:9092/auth;DB_CLOSE_DELAY=-1;WRITE_DELAY=0
+              username: sa
+              password:
 #              driverClass: org.h2.Driver
 #              jdbcUrl: jdbc:mysql://127.0.0.1/xinqch_master?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&rewriteBatchedStatements=TRUE&zeroDateTimeBehavior=convertToNull
 #              username: root
@@ -91,7 +91,7 @@ mybatis-plus:
   typeAliasesPackage: com.fastbuild.entity
   global-config:
     #主键类型  0:"数据库ID自增", 1:"用户输入ID",2:"全局唯一ID (数字类型唯一ID)", 3:"全局唯一ID UUID";
-    id-type: 0
+    id-type: 1
     #字段策略 0:"忽略判断",1:"非 NULL 判断"),2:"非空判断"
     field-strategy: 0
     #驼峰下划线转换

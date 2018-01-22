@@ -1,13 +1,19 @@
 package com.fastbuild.auth.config;
 
+import com.fastbuild.auth.service.IAuthUserDetailService;
+import com.fastbuild.auth.service.impl.AuthUserDetailServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
+import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+
+import javax.annotation.Resource;
 
 /**
  * oauth2 配置管理
@@ -19,14 +25,18 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @EnableWebSecurity
 public class AuthSercuityManager  extends WebSecurityConfigurerAdapter {
 
+    @Resource(name = "authUserDetailService")
+    private IAuthUserDetailService authUserDetailService;
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication()
-                .withUser("user_1").password("123456").authorities("USER")
-                .and()
-                .withUser("user_2").password("123456").authorities("USER")
-                .and()
-                .withUser("admin").password("admin").authorities("ROLE_ADMIN");
+        auth.userDetailsService(authUserDetailService).passwordEncoder(new Md5PasswordEncoder());
+//        auth.inMemoryAuthentication()
+//                .withUser("user_1").password("123456").authorities("USER")
+//                .and()
+//                .withUser("user_2").password("123456").authorities("USER")
+//                .and()
+//                .withUser("admin").password("admin").authorities("ROLE_ADMIN");
     }
 
     /**

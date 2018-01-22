@@ -29,7 +29,7 @@ public class GeneratorCodeManger {
     //作者
     private static String authorName="xinqch";
     //table名字
-    private static String table="auth_user";
+    private static String table="oauth_client_details";
     //table前缀
     private static String prefix="t_";
     //文件生成地址

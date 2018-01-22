@@ -78,3 +78,63 @@ CREATE TABLE `auth_role_resource` (
   `resource_id` VARCHAR(255) NOT NULL COMMENT '资源ID',
   PRIMARY KEY (`id`));
 
+
+--   oauth2 默认建表语句
+-- used in tests that use HSQL
+create table oauth_client_details (
+  id VARCHAR(64)	PRIMARY KEY ,
+  client_id VARCHAR(256)  ,
+  client_name	VARCHAR(255)  ,
+  resource_ids VARCHAR(256)  ,
+  client_secret VARCHAR(256) ,
+  scope VARCHAR(256),
+  authorized_grant_types VARCHAR(256),
+  web_server_redirect_uri  VARCHAR(256) COMMENT '重定向url',
+  authorities VARCHAR(256),
+  access_token_validity INTEGER ,
+  refresh_token_validity INTEGER ,
+  additional_information VARCHAR(4096),
+  autoapprove VARCHAR(256),
+  `register_time` timestamp NOT NULL COMMENT '注册时间',
+  `update_time` timestamp NULL DEFAULT NULL COMMENT '修改时间',
+  `freeze_time` timestamp NULL DEFAULT NULL COMMENT '冻结时间',
+  `bak` varchar(45) DEFAULT NULL COMMENT '扩展字段'
+);
+
+
+create table oauth_client_token (
+  token_id VARCHAR(256),
+  token LONGVARBINARY,
+  authentication_id VARCHAR(256) PRIMARY KEY,
+  user_name VARCHAR(256),
+  client_id VARCHAR(256)
+);
+
+create table oauth_access_token (
+  token_id VARCHAR(256),
+  token LONGVARBINARY,
+  authentication_id VARCHAR(256) PRIMARY KEY,
+  user_name VARCHAR(256),
+  client_id VARCHAR(256),
+  authentication LONGVARBINARY,
+  refresh_token VARCHAR(256)
+);
+
+create table oauth_refresh_token (
+  token_id VARCHAR(256),
+  token LONGVARBINARY,
+  authentication LONGVARBINARY
+);
+
+create table oauth_code (
+  code VARCHAR(256), authentication LONGVARBINARY
+);
+
+create table oauth_approvals (
+	userId VARCHAR(256),
+	clientId VARCHAR(256),
+	scope VARCHAR(256),
+	status VARCHAR(10),
+	expiresAt TIMESTAMP,
+	lastModifiedAt TIMESTAMP
+);
