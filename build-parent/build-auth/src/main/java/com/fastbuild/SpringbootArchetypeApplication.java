@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.util.ClassUtils;
 
 import java.io.File;
 import java.sql.SQLException;
@@ -49,10 +50,13 @@ public class SpringbootArchetypeApplication {
 			if(platform.equals(EPlatform.Windows)){
 				h2DBBaseDir = "D:\\home\\h2_base\\";
 			}else if (platform.equals(EPlatform.Mac_OS)||platform.equals(EPlatform.Mac_OS_X)||platform.equals(EPlatform.Linux)){
-				h2DBBaseDir = "/usr/local/h2_base/";
+				String usrHome = System.getProperty("user.home");
+				h2DBBaseDir = usrHome+"/h2_base/";
 			}else{
 				throw new RuntimeException("当前系统不匹配，此仅支持 windows，linux ，mac");
 			}
+//			String userDir = System.getProperty("user.dir");
+//			System.out.println("userDir"+userDir);
 			File file = new File(h2DBBaseDir);
 			if (!file.exists()) file.mkdirs();
 			Server h2Server = Server.createTcpServer("-tcpAllowOthers","-baseDir",h2DBBaseDir).start();

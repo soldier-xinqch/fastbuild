@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.junit.Assert;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
  * @auther xinch
  * @create 2018/1/16 16:30
  */
-public class AuthJwtUser implements UserDetails {
+public class AuthJwtUser extends User {
 
     private final String id;
     private final String username; //设置为account
@@ -33,69 +34,14 @@ public class AuthJwtUser implements UserDetails {
      * @param authorities
      */
     public AuthJwtUser(String id, String username, String password,  Collection<? extends GrantedAuthority> authorities) {
+        super(username,password,authorities);
+        // 如果用户被锁定 则抛出异常 并提示在5分钟后重新登陆
+
         this.id = id;
         this.username = username;
         this.password = password;
         this.authorities = authorities;
     }
-
-    /**
-     * 返回分配给用户的角色列表
-     * @return
-     */
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
-
-    @Override
-    public String getPassword() {
-        return null;
-    }
-
-    @Override
-    public String getUsername() {
-        return null;
-    }
-
-    /**
-     * 账户是否未过期
-     * @return
-     */
-    @Override
-    public boolean isAccountNonExpired() {
-        return false;
-    }
-
-
-    /**
-     * 账户是否未锁定
-     * @return
-     */
-    @Override
-    public boolean isAccountNonLocked() {
-        return false;
-    }
-
-    /**
-     * 密码是否未过期
-     * @return
-     */
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return false;
-    }
-
-
-    /**
-     * 账户是否激活
-     * @return
-     */
-    @Override
-    public boolean isEnabled() {
-        return false;
-    }
-
 
     /**
      *  根据用户信息构建认证用户信息实体

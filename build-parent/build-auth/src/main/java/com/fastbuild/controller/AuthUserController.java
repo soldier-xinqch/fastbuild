@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
  * ---------------------------------
  * @since 2018-01-18
  */
+@SuppressWarnings("Duplicates")
 @RestController
 @RequestMapping("/authUser")
 public class AuthUserController {
