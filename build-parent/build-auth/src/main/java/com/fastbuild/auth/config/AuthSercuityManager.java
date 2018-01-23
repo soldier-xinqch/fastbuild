@@ -55,7 +55,8 @@ public class AuthSercuityManager  extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) throws Exception {
         super.configure(web);
-        web.ignoring().antMatchers("/static/**");
+        // 忽略地址前缀
+        web.ignoring().antMatchers("/static/**","/h2-console/**");
     }
 
     @Override

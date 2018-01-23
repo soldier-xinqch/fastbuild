@@ -71,7 +71,7 @@ datasource:
           maxPoolPreparedStatementPerConnectionSize: 50
       master:
               driverClass: org.h2.Driver
-              jdbcUrl: jdbc:h2:tcp://192.168.10.87:9092/auth;DB_CLOSE_DELAY=-1;WRITE_DELAY=0
+              jdbcUrl: jdbc:h2:tcp://127.0.0.1:9092/auth;DB_CLOSE_DELAY=-1;WRITE_DELAY=0
               username: sa
               password:
 #              driverClass: org.h2.Driver
