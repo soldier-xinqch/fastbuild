@@ -11,6 +11,7 @@
     <module>build-auth</module>
     <module>build-oauth2</module>
       <module>build-mybatisplus</module>
+      <module>build-ehcache</module>
   </modules>
 
   <packaging>pom</packaging>
