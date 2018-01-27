@@ -4,7 +4,9 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
+import org.ehcache.PersistentCacheManager;
 import org.ehcache.config.builders.*;
+import org.ehcache.config.units.EntryUnit;
 import org.ehcache.config.units.MemoryUnit;
 import org.ehcache.event.CacheEventListener;
 import org.ehcache.event.EventFiring;
@@ -51,47 +53,102 @@ public class CustomCacheManager {
     /**
      *  缓存控制器
      */
-    private CacheManager cacheManager;
+    private PersistentCacheManager cacheManager;
 
     public CustomCacheManager(String diskFilePath,String diskAppName,String cacheName) {
         this.diskFilePath = diskFilePath;
         this.diskAppName = diskAppName;
         this.cacheName = cacheName;
-        // 注册事件监听
-        CacheEventListenerConfigurationBuilder cacheEventListenerConfiguration = this.setEventListers(new CacheLogListener(), EventType.CREATED, EventType.UPDATED);
-        // 初始化 缓存控制器
-        CacheManagerBuilder<CacheManager> cacheBuilder = CacheManagerBuilder.newCacheManagerBuilder();
-        // 设置持久化目录
-        this.setDiskPersistence(cacheBuilder);
-        // 设置线程池
-        Map<String, Integer[]> poolMap = new HashMap<>();
-        poolMap.put("defaultEventPool", new Integer[]{1, 3});
-        poolMap.put("cache2Pool", new Integer[]{2, 2});
-        this.setThreadPool(cacheBuilder, poolMap);
-        // 构建缓存器
-        Map<CacheEnum.CacheResourceType, ResourceTypeModel> resourceMap = new HashMap<>();
-        resourceMap.put(CacheEnum.CacheResourceType.head, new ResourceTypeModel(10L, null));
-        resourceMap.put(CacheEnum.CacheResourceType.offhead, new ResourceTypeModel(10L, MemoryUnit.MB));
-        resourceMap.put(CacheEnum.CacheResourceType.disk, new ResourceTypeModel(400L, MemoryUnit.MB));
-        ResourcePoolsBuilder resourcePoolsBuilder = this.setResourcePolls(CacheEnum.CacheResourceType.none, resourceMap);
-
-        CacheConfigurationBuilder configBuilder = this.buildCacheConfig(Object.class, Object.class, resourcePoolsBuilder);
-        configBuilder.withExpiry(Expirations.timeToLiveExpiration(Duration.of(20, TimeUnit.SECONDS))); // 设置过期时间
-        // 设置过期时间
-        setExpiryOfCache(configBuilder,3600L,TimeUnit.SECONDS);
-        // 添加事件监听
-        addEventListenerOfCache(configBuilder,cacheEventListenerConfiguration);
-        // 指出所需的并发级别
-        setConcurrencyOfCache(configBuilder,10);
-        // 设置默认使用线程池
-        setThreadPoolOfCache(configBuilder,"cache2Pool",2);
-
-        if (StringUtils.isEmpty(this.cacheName)) cacheName = defaultCacheName;
-        // 设置 缓存器
-        this.setCache(cacheBuilder,cacheName ,configBuilder);
-        cacheManager = cacheBuilder.build(true);
+        inintDiskCacheManager();
         System.out.println("diskFilePath = [" + diskFilePath + "], diskAppName = [" + diskAppName + "], cacheName = [" + cacheName + "]");
     }
+
+
+    public void inintCacheManager(){
+        CacheEventListenerConfigurationBuilder cacheEventListenerConfiguration = this.setEventListers(new CacheLogListener(), EventType.CREATED, EventType.UPDATED);
+        this.cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
+                .with(CacheManagerBuilder.persistence(new File(getStoragePath(),this.diskAppName)))
+                .using(PooledExecutionServiceConfigurationBuilder.newPooledExecutionServiceConfigurationBuilder()
+                        .defaultPool("defaultEventPool",1,10)
+                        .pool("READCACHEPOOL", 1, 3)
+                        .pool("WRITECACHEPOOL", 1, 3)
+                        .pool("DISKCACHEPOOL", 2, 2)
+                        .build())
+                .withDefaultEventListenersThreadPool("defaultEventPool")
+                .withCache(this.cacheName,
+                        CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
+                                ResourcePoolsBuilder.newResourcePoolsBuilder().heap(10, EntryUnit.ENTRIES))
+                                .add(CacheEventListenerConfigurationBuilder
+                                        .newEventListenerConfiguration(new CacheLogListener(), EventType.CREATED, EventType.UPDATED))
+                                .withDispatcherConcurrency(10) // 指出所需的并发级别
+                                .add(cacheEventListenerConfiguration)
+                                .withExpiry(Expirations.timeToLiveExpiration(Duration.of(0, TimeUnit.NANOSECONDS))))//不过期
+                .build(true);
+    }
+
+    public void inintDiskCacheManager(){
+        CacheEventListenerConfigurationBuilder cacheEventListenerConfiguration = this.setEventListers(new CacheLogListener(), EventType.CREATED, EventType.UPDATED);
+        this.cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
+                .with(CacheManagerBuilder.persistence(new File(getStoragePath(),this.diskAppName)))
+                .using(PooledExecutionServiceConfigurationBuilder.newPooledExecutionServiceConfigurationBuilder()
+                        .defaultPool("defaultEventPool",1,10)
+                        .pool("DISKCACHEPOOL", 2, 10)
+                        .build())
+                .withDefaultEventListenersThreadPool("defaultEventPool")
+                .withCache(this.cacheName,
+                        CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
+                                ResourcePoolsBuilder.newResourcePoolsBuilder()
+                                        .heap(50, EntryUnit.ENTRIES)
+                                        .offheap(50, MemoryUnit.MB)
+                                        .disk(200, MemoryUnit.MB, true))
+                                .add(cacheEventListenerConfiguration)
+                                .withDispatcherConcurrency(10) // 指出所需的并发级别
+                                .withDiskStoreThreadPool("DISKCACHEPOOL", 2)
+                ).build(true);
+    }
+
+
+    public void createCache(String customCacheName){
+        this.cacheManager.createCache(customCacheName,CacheConfigurationBuilder.newCacheConfigurationBuilder(Long.class, String.class,
+                ResourcePoolsBuilder.newResourcePoolsBuilder().heap(10, EntryUnit.ENTRIES))
+                .add(CacheEventListenerConfigurationBuilder
+                        .newEventListenerConfiguration(new CacheLogListener(), EventType.CREATED, EventType.UPDATED))
+                .withDispatcherConcurrency(10) // 指出所需的并发级别
+                .withExpiry(Expirations.timeToLiveExpiration(Duration.of(20, TimeUnit.SECONDS))));// 设置过期时间
+    }
+
+    public void createCache(String customCacheName,CacheEventListenerConfigurationBuilder cacheEventListenerConfiguration){
+        this.cacheManager.createCache(customCacheName,CacheConfigurationBuilder.newCacheConfigurationBuilder(Long.class, String.class,
+                ResourcePoolsBuilder.newResourcePoolsBuilder().heap(10, EntryUnit.ENTRIES))
+                .add(CacheEventListenerConfigurationBuilder
+                        .newEventListenerConfiguration(new CacheLogListener(), EventType.CREATED, EventType.UPDATED))
+                .add(cacheEventListenerConfiguration)
+                .withDispatcherConcurrency(10) // 指出所需的并发级别
+                .withExpiry(Expirations.timeToLiveExpiration(Duration.of(20, TimeUnit.SECONDS))));// 设置过期时间
+    }
+
+    public void createDiskCache(String customCacheName){
+        this.cacheManager.createCache(customCacheName,CacheConfigurationBuilder.newCacheConfigurationBuilder(Long.class, String.class,
+                ResourcePoolsBuilder.newResourcePoolsBuilder()
+                        .heap(50, EntryUnit.ENTRIES)
+                        .offheap(50, MemoryUnit.MB)
+                        .disk(200, MemoryUnit.MB, true))
+                .withDispatcherConcurrency(10) // 指出所需的并发级别
+                .withDiskStoreThreadPool("DISKCACHEPOOL", 2));// 设置过期时间
+    }
+
+    public void createDiskCache(String customCacheName,CacheEventListenerConfigurationBuilder cacheEventListenerConfiguration){
+        this.cacheManager.createCache(customCacheName,CacheConfigurationBuilder.newCacheConfigurationBuilder(Long.class, String.class,
+                ResourcePoolsBuilder.newResourcePoolsBuilder()
+                        .heap(50, EntryUnit.ENTRIES)
+                        .offheap(50, MemoryUnit.MB)
+                        .disk(200, MemoryUnit.MB, true))
+                .add(cacheEventListenerConfiguration)
+                .withDispatcherConcurrency(10) // 指出所需的并发级别
+                .withDiskStoreThreadPool("DISKCACHEPOOL", 2));// 设置过期时间
+    }
+
+
 
     public void closeManager(){
         this.cacheManager.close();;
@@ -127,6 +184,40 @@ public class CustomCacheManager {
     public void destoryCacheEventListener(Cache cache,CacheEventListener<?, ?> listener){
         cache.getRuntimeConfiguration().deregisterCacheEventListener(listener);
     }
+
+
+    /**
+     *  设置缓存持久化落地目录
+     * @return
+     */
+    private File getStoragePath() {
+        if(StringUtils.isEmpty(this.diskFilePath)) throw new RuntimeException("创建缓存控制器失败：缓存落地目录为空");
+        return new File(diskFilePath);
+    }
+
+    public void setDiskFilePath(String diskFilePath) {
+        this.diskFilePath = diskFilePath;
+    }
+
+    public void setDiskAppName(String diskAppName) {
+        this.diskAppName = diskAppName;
+    }
+
+    public void setCacheName(String cacheName) {
+        this.cacheName = cacheName;
+    }
+
+    public CacheManager getCacheManager() {
+        return cacheManager;
+    }
+
+
+
+
+
+
+
+
 
 
     /**
@@ -251,69 +342,4 @@ public class CustomCacheManager {
                 .unordered().asynchronous();
     }
 
-    /**
-     *  设置缓存持久化落地目录
-     * @return
-     */
-    private File getStoragePath() {
-        if(StringUtils.isEmpty(this.diskFilePath)) throw new RuntimeException("创建缓存控制器失败：缓存落地目录为空");
-        return new File(diskFilePath);
-    }
-
-    public void setDiskFilePath(String diskFilePath) {
-        this.diskFilePath = diskFilePath;
-    }
-
-    public void setDiskAppName(String diskAppName) {
-        this.diskAppName = diskAppName;
-    }
-
-    public void setCacheName(String cacheName) {
-        this.cacheName = cacheName;
-    }
-
-    public CacheManager getCacheManager() {
-        return cacheManager;
-    }
-
-
-//    public void createCacheManager(){
-//        // 缓存的事件监听
-//        CacheEventListenerConfigurationBuilder cacheEventListenerConfiguration = CacheEventListenerConfigurationBuilder
-//                // CacheEventListenerConfiguration使用构建器创建一个指示侦听器和要接收的事件（在这种情况下，创建和更新事件）
-//                .newEventListenerConfiguration(new CacheLogListener(), EventType.CREATED, EventType.UPDATED)
-//                // 可选地指示交付模式 - 默认值是异步的和无序的（出于性能原因）
-//                .unordered().asynchronous();
-//
-//        PersistentCacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
-//                .with(CacheManagerBuilder.persistence(new File(getStoragePath(), "myData")))
-//                .using(newPooledExecutionServiceConfigurationBuilder()
-//                        .pool("defaultEventPool", 1, 3)
-//                        .pool("cache2Pool", 2, 2)
-//                        .build())
-//                .withDefaultEventListenersThreadPool("defaultEventPool")
-//                .withCache("cache1",
-//                        CacheConfigurationBuilder.newCacheConfigurationBuilder(Long.class, String.class,
-//                                ResourcePoolsBuilder.newResourcePoolsBuilder().heap(10, EntryUnit.ENTRIES))
-//                                .add(CacheEventListenerConfigurationBuilder
-//                                        .newEventListenerConfiguration(new CacheLogListener(), EventType.CREATED, EventType.UPDATED))
-//                                .withDispatcherConcurrency(10) // 指出所需的并发级别
-//                                .withExpiry(Expirations.timeToLiveExpiration(Duration.of(20, TimeUnit.SECONDS)))) // 设置过期时间
-//                .withCache(CACHE_NAME,
-//                        CacheConfigurationBuilder.newCacheConfigurationBuilder(Long.class, String.class,
-//                                ResourcePoolsBuilder.newResourcePoolsBuilder()
-//                                        .heap(10, EntryUnit.ENTRIES)
-//                                        .offheap(1, MemoryUnit.MB)
-//                                        .disk(20, MemoryUnit.MB, true))
-//                                .add(cacheEventListenerConfiguration)
-//                                .withDispatcherConcurrency(10) // 指出所需的并发级别
-//                                .withDiskStoreThreadPool("cache2Pool", 2)
-//                ).build(true);
-//
-//
-//        Cache<Long, String> threeTieredCache =cacheManager.getCache(CACHE_NAME, Long.class, String.class);
-////        threeTieredCache.put(1L, "stillAvailableAfterRestart");
-//        System.out.println("args = [" +   threeTieredCache.get(1L) + "]");
-//        cacheManager.close();
-//    }
 }
